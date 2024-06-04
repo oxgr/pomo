@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"time"
 )
@@ -116,5 +117,21 @@ func show() error {
 	rem_mins := remaining / 60
 	rem_secs := remaining % 60
 	fmt.Printf("%02d:%02d\n", rem_mins, rem_secs)
+	return nil
+}
+
+func info() error {
+	model, err := readModel()
+	if err != nil {
+		return err
+	}
+
+	modelJson, err := json.MarshalIndent(model, "", "  ")
+	if err != nil {
+		return err
+	}
+
+	fmt.Println(string(modelJson))
+
 	return nil
 }

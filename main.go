@@ -54,6 +54,14 @@ func main() {
 					return show()
 				},
 			},
+			{
+				Name:    "info",
+				Aliases: []string{"i"},
+				Usage:   "show info",
+				Action: func(cCtx *cli.Context) error {
+					return info()
+				},
+			},
 		},
 	}
 
