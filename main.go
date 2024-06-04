@@ -56,6 +56,14 @@ func main() {
 				},
 			},
 			{
+				Name:    "done",
+				Aliases: []string{"d"},
+				Usage:   "set the timer to done",
+				Action: func(cCtx *cli.Context) error {
+					return done()
+				},
+			},
+			{
 				Name:    "show",
 				Aliases: []string{"t"},
 				Usage:   "show the status or remaining time",

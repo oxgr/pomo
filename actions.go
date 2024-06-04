@@ -91,7 +91,23 @@ func pause() error {
 	}
 
 	fmt.Println("timer paused~")
+	return nil
+}
 
+func done() error {
+	model, err := readModel()
+	if err != nil {
+		return err
+	}
+
+	model.Active = false
+	model.Done = true
+
+	if err := writeModel(model); err != nil {
+		return err
+	}
+
+	fmt.Println("timer set to done~")
 	return nil
 }
 
@@ -107,7 +123,7 @@ func show(formatJson bool) error {
 	}
 
 	if !model.Active {
-		showObj := Show{}
+		var showObj Show
 
 		if model.Duration == 0 {
 			// showObj.Class = "stopped"
@@ -119,17 +135,18 @@ func show(formatJson bool) error {
 			showObj.Class = "done"
 		}
 
+		var str string
+
 		if !formatJson {
-			fmt.Println(showObj.Class)
-			return nil
+			str = showObj.Class
+		} else {
+			str, err = toJson(showObj, false)
+			if err != nil {
+				return err
+			}
 		}
 
-		jsonStr, err := toJson(showObj, false)
-		if err != nil {
-			return err
-		}
-
-		fmt.Println(jsonStr)
+		fmt.Println(str)
 		return nil
 	}
 
@@ -146,17 +163,18 @@ func show(formatJson bool) error {
 			Class: "done",
 		}
 
+		var str string
+
 		if !formatJson {
-			fmt.Println(showObj.Class)
-			return nil
+			str = showObj.Class
+		} else {
+			str, err = toJson(showObj, false)
+			if err != nil {
+				return err
+			}
 		}
 
-		jsonStr, err := toJson(showObj, false)
-		if err != nil {
-			return err
-		}
-
-		fmt.Println(jsonStr)
+		fmt.Println(str)
 		return nil
 	}
 
@@ -167,17 +185,18 @@ func show(formatJson bool) error {
 		Class: "active",
 	}
 
+	var str string
+
 	if !formatJson {
-		fmt.Println(showObj.Text)
-		return nil
+		str = showObj.Text
+	} else {
+		str, err = toJson(showObj, false)
+		if err != nil {
+			return err
+		}
 	}
 
-	jsonStr, err := toJson(showObj, false)
-	if err != nil {
-		return err
-	}
-
-	fmt.Println(jsonStr)
+	fmt.Println(str)
 	return nil
 }
 
@@ -187,7 +206,12 @@ func info() error {
 		return err
 	}
 
-	fmt.Println(toJson(model, true))
+	modelJson, err := toJson(model, true)
+	if err != nil {
+		return err
+	}
+
+	fmt.Println(modelJson)
 
 	return nil
 }

@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"os/exec"
 )
 
 func check(e error) {
@@ -66,4 +67,14 @@ func toJson(obj any, indent bool) (string, error) {
 	}
 
 	return string(jsonStr), nil
+}
+
+func notify(msg string) error {
+	cmd := exec.Command("notify-send", "Timer finished!")
+	_, err := cmd.Output()
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
