@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"os"
 	"strconv"
@@ -18,14 +19,22 @@ func main() {
 				Action: func(cCtx *cli.Context) error {
 					arg := cCtx.Args().First()
 
-					mins := func(str string) int {
-						if str != "" {
-							mins, err := strconv.Atoi(arg)
-							check(err)
-							return mins
+					mins, err := func(str string) (int, error) {
+						if str == "" {
+							return 0, nil
 						}
-						return 0
+
+						mins, err := strconv.Atoi(arg)
+						if err != nil {
+							fmt.Println("could not parse number!")
+							return 0, err
+						}
+
+						return mins, nil
 					}(arg)
+					if err != nil {
+						return err
+					}
 
 					return start(mins)
 				},
