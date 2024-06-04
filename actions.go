@@ -38,7 +38,6 @@ func start(mins int) error {
 		}
 
 		model.Active = true
-		model.Done = false
 
 		if err := writeModel(model); err != nil {
 			return err
