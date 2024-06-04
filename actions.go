@@ -13,17 +13,15 @@ type Model struct {
 }
 
 func start(mins int) error {
+	const DEFAULT_MINS = 25
+
 	var model Model
 
 	if mins == 0 {
+
 		model, err := readModel()
 		if err != nil {
 			return err
-		}
-
-		if model.Duration == 0 {
-			fmt.Println("no time recorded - pass a <num> of mins pls!")
-			return nil
 		}
 
 		if model.Active {
@@ -31,19 +29,26 @@ func start(mins int) error {
 			return nil
 		}
 
-		if model.Done {
-			fmt.Println("timer is done!")
-			return nil
-		}
+		mins = DEFAULT_MINS
 
-		model.Active = true
-
-		if err := writeModel(model); err != nil {
-			return err
-		}
-
-		fmt.Println("timer resumed...")
-		return nil
+		// if model.Duration == 0 {
+		// 	fmt.Println("no time recorded - pass a <num> of mins pls!")
+		// 	return nil
+		// }
+		//
+		// if model.Done {
+		// 	fmt.Println("timer is done!")
+		// 	return nil
+		// }
+		//
+		// model.Active = true
+		//
+		// if err := writeModel(model); err != nil {
+		// 	return err
+		// }
+		//
+		// fmt.Println("timer resumed...")
+		// return nil
 	}
 
 	seconds := mins * 60
