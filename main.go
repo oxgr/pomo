@@ -15,6 +15,7 @@ type Model struct {
 	Start    int  `json:"start"`
 	Duration int  `json:"duration"`
 	Active   bool `json:"active"`
+	Done     bool `json:"done"`
 }
 
 func check(e error) {
@@ -111,7 +112,7 @@ func readModel() (Model, error) {
 	var model Model
 
 	if err := json.Unmarshal([]byte(str), &model); err != nil {
-		check(err)
+		return model, err
 	}
 
 	return model, nil
@@ -121,26 +122,22 @@ func start(mins int) error {
 	var model Model
 
 	if mins == 0 {
-		oldModel, err := readModel()
+		model, err := readModel()
 		if err != nil {
 			return err
 		}
 
-		if oldModel.Duration == 0 {
+		if model.Duration == 0 {
 			fmt.Println("no time recorded - pass a <num> of mins pls!")
 			return nil
 		}
 
-		if oldModel.Active {
+		if model.Active {
 			fmt.Println("timer is already active!")
 			return nil
 		}
 
-		model = Model{
-			Start:    oldModel.Start,
-			Duration: oldModel.Duration,
-			Active:   true,
-		}
+		model.Active = true
 
 		if err := writeModel(model); err != nil {
 			return err
@@ -167,11 +164,7 @@ func start(mins int) error {
 }
 
 func stop() error {
-	model := Model{
-		Start:    int(time.Now().Unix()),
-		Duration: 0,
-		Active:   false,
-	}
+	model := Model{}
 
 	if err := writeModel(model); err != nil {
 		return err
@@ -182,18 +175,14 @@ func stop() error {
 }
 
 func pause() error {
-	oldModel, err := readModel()
+	model, err := readModel()
 	if err != nil {
 		return err
 	}
 
-	newModel := Model{
-		Start:    oldModel.Start,
-		Duration: oldModel.Duration,
-		Active:   false,
-	}
+	model.Active = false
 
-	if err := writeModel(newModel); err != nil {
+	if err := writeModel(model); err != nil {
 		return err
 	}
 
@@ -222,18 +211,12 @@ func show() error {
 
 	if remaining < 0 {
 		fmt.Println("done")
-		return nil
-
-		newModel := Model{
-			Start:    oldModel.Start,
-			Duration: oldModel.Duration,
-			Active:   false,
-		}
-
-		if err := writeModel(newModel); err != nil {
+		model.Active = false
+		model.Done = true
+		if err := writeModel(model); err != nil {
 			return err
 		}
-
+		return nil
 	}
 
 	rem_mins := remaining / 60
