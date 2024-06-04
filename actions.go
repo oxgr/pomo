@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 	"time"
 )
@@ -91,37 +90,87 @@ func pause() error {
 	return nil
 }
 
-func show() error {
+func show(formatJson bool) error {
 	model, err := readModel()
 	if err != nil {
 		return err
 	}
 
-	if model.Duration == 0 {
-		fmt.Println("stopped")
-		return nil
+	type Show struct {
+		Text  string `json:"text"`
+		Class string `json:"class"`
 	}
 
 	if !model.Active {
-		fmt.Println("paused")
+		showObj := Show{}
+
+		if model.Duration == 0 {
+			showObj.Class = "stopped"
+		} else if !model.Done {
+			showObj.Class = "paused"
+		} else {
+			showObj.Class = "done"
+		}
+
+		if !formatJson {
+			fmt.Println(showObj.Class)
+			return nil
+		}
+
+		jsonStr, err := toJson(showObj, false)
+		if err != nil {
+			return err
+		}
+
+		fmt.Println(jsonStr)
 		return nil
 	}
 
 	remaining := model.Start + model.Duration - int(time.Now().Unix())
 
 	if remaining < 0 {
-		fmt.Println("done")
 		model.Active = false
 		model.Done = true
 		if err := writeModel(model); err != nil {
 			return err
 		}
+
+		showObj := Show{
+			Class: "done",
+		}
+
+		if !formatJson {
+			fmt.Println(showObj.Class)
+			return nil
+		}
+
+		jsonStr, err := toJson(showObj, false)
+		if err != nil {
+			return err
+		}
+
+		fmt.Println(jsonStr)
 		return nil
 	}
 
 	rem_mins := remaining / 60
 	rem_secs := remaining % 60
-	fmt.Printf("%02d:%02d\n", rem_mins, rem_secs)
+	showObj := Show{
+		Text:  fmt.Sprintf("%02d:%02d", rem_mins, rem_secs),
+		Class: "active",
+	}
+
+	if !formatJson {
+		fmt.Println(showObj.Text)
+		return nil
+	}
+
+	jsonStr, err := toJson(showObj, false)
+	if err != nil {
+		return err
+	}
+
+	fmt.Println(jsonStr)
 	return nil
 }
 
@@ -131,12 +180,7 @@ func info() error {
 		return err
 	}
 
-	modelJson, err := json.MarshalIndent(model, "", "  ")
-	if err != nil {
-		return err
-	}
-
-	fmt.Println(string(modelJson))
+	fmt.Println(toJson(model, true))
 
 	return nil
 }

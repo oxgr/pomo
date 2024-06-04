@@ -51,3 +51,19 @@ func readModel() (Model, error) {
 
 	return model, nil
 }
+
+func toJson(obj any, indent bool) (string, error) {
+	var jsonStr []byte
+	var err error
+
+	if indent {
+		jsonStr, err = json.MarshalIndent(obj, "", "  ")
+	} else {
+		jsonStr, err = json.Marshal(obj)
+	}
+	if err != nil {
+		return "", err
+	}
+
+	return string(jsonStr), nil
+}

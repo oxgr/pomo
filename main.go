@@ -59,8 +59,15 @@ func main() {
 				Name:    "show",
 				Aliases: []string{"t"},
 				Usage:   "show the status or remaining time",
+				Flags: []cli.Flag{
+					&cli.BoolFlag{
+						Name:  "json",
+						Value: false,
+						Usage: "show in json format",
+					},
+				},
 				Action: func(cCtx *cli.Context) error {
-					return show()
+					return show(cCtx.Bool("json"))
 				},
 			},
 			{
