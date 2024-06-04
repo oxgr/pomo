@@ -105,10 +105,12 @@ func show(formatJson bool) error {
 		showObj := Show{}
 
 		if model.Duration == 0 {
-			showObj.Class = "stopped"
+			// showObj.Class = "stopped"
+			return nil
 		} else if !model.Done {
 			showObj.Class = "paused"
 		} else {
+			showObj.Text = "done"
 			showObj.Class = "done"
 		}
 
