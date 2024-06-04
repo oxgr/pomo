@@ -32,6 +32,11 @@ func start(mins int) error {
 			return nil
 		}
 
+		if model.Done {
+			fmt.Println("timer is done!")
+			return nil
+		}
+
 		model.Active = true
 		model.Done = false
 
